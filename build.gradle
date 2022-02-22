@@ -1,0 +1,68 @@
+plugins {
+    id("groovy") 
+    id("com.github.johnrengelman.shadow") version "7.1.1"
+    id("io.micronaut.application") version "3.2.1"
+}
+
+version = "0.1"
+group = "com.mobilesolution"
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("io.micronaut:micronaut-http-client")
+    implementation("io.micronaut:micronaut-jackson-databind")
+    implementation("io.micronaut:micronaut-session")
+    implementation("io.micronaut.aws:micronaut-aws-sdk-v2")
+    implementation("io.micronaut.flyway:micronaut-flyway")
+    implementation("io.micronaut.groovy:micronaut-mongo-gorm")
+    implementation("io.micronaut.groovy:micronaut-runtime-groovy")
+    implementation("io.micronaut.mongodb:micronaut-mongo-reactive")
+    implementation("io.micronaut.redis:micronaut-redis-lettuce")
+    implementation("io.micronaut.rxjava2:micronaut-rxjava2")
+    implementation("io.micronaut.rxjava2:micronaut-rxjava2-http-client")
+    implementation("io.micronaut.rxjava3:micronaut-rxjava3")
+    implementation("io.micronaut.rxjava3:micronaut-rxjava3-http-client")
+    implementation("jakarta.annotation:jakarta.annotation-api")
+    compileOnly("io.micronaut:micronaut-http-validation")
+    runtimeOnly("org.slf4j:slf4j-simple")
+    testImplementation("org.testcontainers:mongodb")
+    testImplementation("org.testcontainers:spock")
+    testImplementation("org.testcontainers:testcontainers")
+    implementation("io.micronaut:micronaut-validation")
+
+    testImplementation("io.micronaut:micronaut-function")
+
+}
+
+
+application {
+    mainClass.set("com.mobilesolution.Application")
+}
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+    targetCompatibility = JavaVersion.toVersion("17")
+}
+
+graalvmNative.toolchainDetection = false
+micronaut {
+    runtime("lambda")
+    testRuntime("spock2")
+    processing {
+        incremental(true)
+        annotations("com.mobilesolution.*")
+    }
+}
+
+
+tasks.named("dockerfileNative") {
+    args(
+        "-XX:MaximumHeapSizePercent=80",
+        "-Dio.netty.allocator.numDirectArenas=0",
+        "-Dio.netty.noPreferDirect=true"
+    )
+}
+
+
